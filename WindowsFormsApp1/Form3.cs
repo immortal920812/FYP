@@ -14,7 +14,12 @@ namespace WindowsFormsApp1
 {
     public partial class Form3 : Form
     {
-        private int index = 0;
+        public DataTable dt1 = new DataTable();
+        public DataTable dt2 = new DataTable();
+        public DataSet ds1 = new DataSet();
+        public DataSet ds2 = new DataSet();
+
+
         public Form3()
         {
             InitializeComponent();
@@ -33,20 +38,44 @@ namespace WindowsFormsApp1
                 Server = "35.198.216.109",
                 UserID = "long",
                 Password = "root",
-                Database = "Xspace",
                 CertificateFile = @"C:\certificate\client.pfx",
                 CACertificateFile = @"C:\certificate\server-ca.pem",
                 CertificatePassword = "pass",
                 SslMode = MySqlSslMode.VerifyCA,
             };
-            MySqlConnection databaseConnection = new MySqlConnection(goolglecloudcertificate.ConnectionString);
 
-            MySqlCommand commandDatabase = new MySqlCommand("SELECT * FROM" + " "+ f2.comboBox1.SelectedItem.ToString() + "." + f2.comboBox2.SelectedItem.ToString()+ "';", databaseConnection);
-        }
+            using (MySqlConnection databaseConnection = new MySqlConnection(goolglecloudcertificate.ConnectionString))
+            {
+                using (MySqlDataAdapter adapter = new MySqlDataAdapter("SELECT * FROM" + " " + this.comboBox1.SelectedItem.ToString() + ";", databaseConnection))
+                {
+                    adapter.Fill(dt1);
+                }
 
-        private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            
+            }
+            if (this.comboBox2.SelectedText.Contains("("))
+            {
+
+            }
+            else
+            {
+                using (MySqlConnection databaseConnection = new MySqlConnection(goolglecloudcertificate.ConnectionString))
+                {
+                    using (MySqlDataAdapter adapter = new MySqlDataAdapter("SELECT * FROM" + " " + this.comboBox2.SelectedItem.ToString() + ";", databaseConnection))
+                    {
+                        adapter.Fill(dt2);
+                    }
+
+                }
+            }
+            dt1.Merge(dt2, false, MissingSchemaAction.Add);
+        
+            Form2.dgv1.DataSource = dt1;
+
+            string PageText = this.comboBox1.SelectedItem.ToString() + "+" + this.comboBox2.SelectedItem.ToString();
+
+            f2.Form3TransmitData(PageText,dt1);
+
+            this.Close();
         }
     }
 }

@@ -73,6 +73,56 @@ namespace WindowsFormsApp1.Properties {
         /// <summary>
         ///   查找 System.Drawing.Bitmap 类型的本地化资源。
         /// </summary>
+        internal static System.Drawing.Bitmap add_icon {
+            get {
+                object obj = ResourceManager.GetObject("add-icon", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
+        /// </summary>
+        internal static System.Drawing.Bitmap Add_icon__1_ {
+            get {
+                object obj = ResourceManager.GetObject("Add-icon (1)", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
+        /// </summary>
+        internal static System.Drawing.Bitmap Alarm_Arrow_Down_icon {
+            get {
+                object obj = ResourceManager.GetObject("Alarm-Arrow-Down-icon", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
+        /// </summary>
+        internal static System.Drawing.Bitmap Alarm_Arrow_Up_icon {
+            get {
+                object obj = ResourceManager.GetObject("Alarm-Arrow-Up-icon", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
+        /// </summary>
+        internal static System.Drawing.Bitmap Alarm_Minus_icon {
+            get {
+                object obj = ResourceManager.GetObject("Alarm-Minus-icon", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
+        /// </summary>
         internal static System.Drawing.Bitmap Apps_Pdf_icon {
             get {
                 object obj = ResourceManager.GetObject("Apps-Pdf-icon", resourceCulture);
@@ -86,6 +136,16 @@ namespace WindowsFormsApp1.Properties {
         internal static System.Drawing.Bitmap Arrow_Merge_icon {
             get {
                 object obj = ResourceManager.GetObject("Arrow-Merge-icon", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
+        /// </summary>
+        internal static System.Drawing.Bitmap delete_icon {
+            get {
+                object obj = ResourceManager.GetObject("delete-icon", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -116,6 +176,26 @@ namespace WindowsFormsApp1.Properties {
         internal static System.Drawing.Bitmap Funnel_icon {
             get {
                 object obj = ResourceManager.GetObject("Funnel-icon", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
+        /// </summary>
+        internal static System.Drawing.Bitmap math_minus_icon {
+            get {
+                object obj = ResourceManager.GetObject("math-minus-icon", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
+        /// </summary>
+        internal static System.Drawing.Bitmap Sign_Add_icon {
+            get {
+                object obj = ResourceManager.GetObject("Sign-Add-icon", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

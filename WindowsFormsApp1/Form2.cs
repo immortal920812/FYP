@@ -23,8 +23,14 @@ namespace WindowsFormsApp1
 {
     public partial class Form2 : Form
     {
-        DataGridView dgv1 = new DataGridView();
+        static public DataGridView dgv1 = new DataGridView();
         public static int index = 0;
+        static public DataSet FilterSet = new DataSet();
+        static DataTable newdt = new DataTable();
+        static public DataTable Finnaldt = new DataTable();
+        static string Filtervalue;
+        Form4 f4 = new Form4();
+        static public DataSet FilterResult = new DataSet();
 
         public Form2()
         {
@@ -32,17 +38,28 @@ namespace WindowsFormsApp1
             Datalist();
         }
 
-        private void LoadChartVariables()
+        private void LoadChartVariables(DataTable dt)
         {
-            var goolglecloudcertificate = dataconnect(this.comboBox1.SelectedItem.ToString());
+            /*var goolglecloudcertificate = dataconnect(this.comboBox1.SelectedItem.ToString());
 
-            MySqlConnection databaseConnection = new MySqlConnection(goolglecloudcertificate);
+            MySqlConnection databaseConnection = new MySqlConnection(goolglecloudcertificate);*/
 
+            //Clear combobox when tabpage changed
             comboBox3.Items.Clear();
 
             comboBox4.Items.Clear();
 
-            TabPage Page = new TabPage();
+            f4.comboBox1.Items.Clear();
+
+            //Load cuurent table headers into combobox
+            foreach (DataColumn dc in dt.Columns)
+            {
+                comboBox3.Items.Add(dc.ColumnName);
+                comboBox4.Items.Add(dc.ColumnName);
+                f4.comboBox1.Items.Add(dc.ColumnName);
+            }
+           
+            /*TabPage Page = new TabPage();
 
             Page = this.tabControl1.SelectedTab;
 
@@ -58,7 +75,7 @@ namespace WindowsFormsApp1
                         }
                     }
 
-            }
+            }*/
 
         }
 
@@ -194,8 +211,8 @@ namespace WindowsFormsApp1
                     DataTable dt = new DataTable();
                     adapter.Fill(dt);
                     dgv1.DataSource = dt;
-                    int colcount = dt.Columns.Count;
-                    Console.WriteLine("列数" + colcount);
+                    LoadChartVariables(dt);
+                    newdt = dt.Copy();
                     //auto size for datagrid//
 
                     /*int height = 0;
@@ -234,7 +251,7 @@ namespace WindowsFormsApp1
 
             this.dgv1.Height = Page.Height;*/ //fix length fill cannot autosize control
 
-            this.dgv1.Dock = DockStyle.Fill;
+            dgv1.Dock = DockStyle.Fill;
 
             AutoSizeColumn(dgv1);
 
@@ -242,42 +259,7 @@ namespace WindowsFormsApp1
 
             this.tabControl1.SelectedTab = Page;
 
-            LoadChartVariables();
-
             index++;
-            //size output
-            /*int x = this.dgv1.Location.X;//当前控件在窗体的X轴位置
-            int y = this.dgv1.Location.Y;//当前控件在窗体的Y轴位置
-
-            int width = this.dgv1.Width;//当前控件的宽度
-            int height = this.dgv1.Height;//当前控件的高度
-
-            int Right = this.dgv1.Right;//当前窗体边界与控件边界之间的宽度差
-            int Bottom = this.dgv1.Bottom;//当前窗体边界与控件边界之间的高度差
-
-            int pagex = this.tabControl1.Location.X;//当前控件在窗体的X轴位置
-            int pagey = this.tabControl1.Location.Y;//当前控件在窗体的Y轴位置
-
-            int pagewidth = this.tabControl1.Width;//当前控件的宽度
-            int pageheight = this.tabControl1.Height;//当前控件的高度
-
-            int pageRight = this.tabControl1.Right;//当前窗体边界与控件边界之间的宽度差
-            int pageBottom = this.tabControl1.Bottom;//当前窗体边界与控件边界之间的高度差
-           
-
-
-
-
-            Console.WriteLine("x = " + x);//X轴
-            Console.WriteLine("y = " + y);//Y轴
-
-            Console.WriteLine("width = " + width);//宽度
-            Console.WriteLine("Height = " + height);//高度
-
-            Console.WriteLine("Right = " + Right);//Y+宽
-            Console.WriteLine("Bottom = " + Bottom);//X+高*/
- 
-
 
         }
 
@@ -331,26 +313,60 @@ namespace WindowsFormsApp1
         {
             //string MySQLConnectionString = "datasource=127.0.0.1;;port=3306;username=root;password=root;database='" + this.comboBox1.SelectedItem.ToString() + "';";
             var goolglecloudcertificate = dataconnect(this.comboBox1.SelectedItem.ToString());
+
             TabPage Page = new TabPage();
 
             Page = this.tabControl1.SelectedTab;
 
-            using (MySqlConnection databaseConnection = new MySqlConnection(goolglecloudcertificate))
+            if (!Page.Text.Contains("+"))
             {
-                using (MySqlDataAdapter adapter = new MySqlDataAdapter("SELECT * FROM" + " " + Page.Text + ";", databaseConnection))
+                if (!Page.Text.Contains("("))
                 {
-                    DataSet ds = new DataSet();
-                    adapter.Fill(ds);
-                    dgv1.DataSource = ds.Tables[0];
+                    using (MySqlConnection databaseConnection = new MySqlConnection(goolglecloudcertificate))
+                    {
+                        using (MySqlDataAdapter adapter = new MySqlDataAdapter("SELECT * FROM" + " " + Page.Text + ";", databaseConnection))
+                        {
+                            DataTable dt = new DataTable();
+                            adapter.Fill(dt);
+                            dgv1.DataSource = dt;
+                            LoadChartVariables(dt);
+                        }
+                    }
                 }
-
+                else
+                {
+                    dgv1.DataSource = FilterResult.Tables[Page.Text];
+                    LoadChartVariables(FilterResult.Tables[Page.Text]);
+                }
+            }
+            else
+            {
+                string str = Page.Text;
+                string[] split = str.Split(new char[] { '+' });
+                DataTable dt = new DataTable();
+                DataTable dt1 = new DataTable();
+                using (MySqlConnection databaseConnection = new MySqlConnection(goolglecloudcertificate))
+                {
+                    using (MySqlDataAdapter adapter = new MySqlDataAdapter("SELECT * FROM" + " " + split[0] + ";", databaseConnection))
+                    {
+                        adapter.Fill(dt);
+                    }
+                }
+                using (MySqlConnection databaseConnection = new MySqlConnection(goolglecloudcertificate))
+                {
+                    using (MySqlDataAdapter adapter = new MySqlDataAdapter("SELECT * FROM" + " " + split[1] + ";", databaseConnection))
+                    {
+                        adapter.Fill(dt1);
+                    }
+                }
+                dt.Merge(dt1, false, MissingSchemaAction.Add);
+                dgv1.DataSource = dt;
+                LoadChartVariables(dt);
             }
 
             Page.Controls.Add(dgv1);
 
             this.tabControl1.SelectedTab = Page;
-
-            LoadChartVariables();
         }
 
         //Cancel current table
@@ -359,10 +375,17 @@ namespace WindowsFormsApp1
             if (this.tabControl1.Controls.Count >1)
             {
                 TabPage Page = tabControl1.SelectedTab;
+                if (FilterSet.Tables.Contains(Page.Text))
+                {
+                    FilterSet.Tables.Remove(Page.Text);
+                }
+                if (FilterResult.Tables.Contains(Page.Text))
+                {
+                    FilterResult.Tables.Remove(Page.Text);
+                }
                 tabControl1.TabPages.Remove(Page);
             }
         }
-
         private void button2_Click(object sender, EventArgs e)
         {
             var goolglecloudcertificate = dataconnect(this.comboBox1.SelectedItem.ToString());
@@ -406,7 +429,7 @@ namespace WindowsFormsApp1
 
             doc.Open();
 
-            DataGridView view = this.dgv1;
+            DataGridView view = dgv1;
 
             PdfPTable table = new PdfPTable(view.Columns.Count);
 
@@ -435,11 +458,16 @@ namespace WindowsFormsApp1
 
         }
 
+        //Output Chart
         private void button4_Click(object sender, EventArgs e)
         {
-            var goolglecloudcertificate = dataconnect(this.comboBox1.SelectedItem.ToString());
+            TabPage Page = new TabPage();
+            Page = this.tabControl1.SelectedTab;
+            string str = Page.Text;
+            string[] split = str.Split(new char[] { '.' });
+            var goolglecloudcertificate = dataconnect(split[0]);
             MySqlConnection databaseConnection = new MySqlConnection(goolglecloudcertificate);
-            MySqlCommand commandDatabase = new MySqlCommand("SELECT * FROM" + " " + this.comboBox1.SelectedItem.ToString() + "." + this.comboBox2.SelectedItem.ToString() + ";", databaseConnection);
+            MySqlCommand commandDatabase = new MySqlCommand("SELECT * FROM" + " " + split[0] + "." + split[1] + ";", databaseConnection);
             MySqlDataReader myReader;
             try
             {
@@ -456,16 +484,144 @@ namespace WindowsFormsApp1
             }
         }
 
+        //Open merge window
         private void button5_Click(object sender, EventArgs e)
         {
             Form3 f3 = new Form3();
             foreach (TabPage Page in tabControl1.TabPages)
             {
-                Console.WriteLine("hi");
                 f3.comboBox1.Items.Add(Page.Text);
                 f3.comboBox2.Items.Add(Page.Text);
             }
             f3.ShowDialog(this);
+        }
+
+        //Get data from merge window
+        public void Form3TransmitData(string PageText,DataTable dt)
+        {
+            TabPage Page = new TabPage();
+
+            Page.Name = "Page" + index.ToString();
+
+            Page.Text = PageText;
+
+            Page.TabIndex = index;
+
+            this.tabControl1.Controls.Add(Page);
+
+            /*this.dgv1.Width = Page.Width;
+
+            this.dgv1.Height = Page.Height;*/ //fix length fill cannot autosize control
+            
+            AutoSizeColumn(dgv1);
+
+            Page.Controls.Add(dgv1);
+
+            this.tabControl1.SelectedTab = Page;
+
+            LoadChartVariables(dt);
+
+            index++;
+
+        }
+
+        private void button6_Click(object sender, EventArgs e)
+        {
+            TabPage Page = this.tabControl1.SelectedTab;
+
+            if (FilterSet.Tables.Contains(Page.Text))
+
+            {
+                f4.Form2TransmitData(Page.Text,FilterSet);
+            }
+            else
+            {
+                f4.Cleardt();
+            }
+            f4.ShowDialog(this);
+        }
+
+        //Transmit filter info from filter window
+        public void Form4TransmitData(DataTable dt)
+        {
+            TabPage Page = this.tabControl1.SelectedTab;
+
+            string PageText = Page.Text;
+
+            int counter = 1;
+
+
+            if (!FilterSet.Tables.Contains(PageText))
+            {
+                string Pagetext = PageText + "(" + counter + ")";
+
+                while (FilterSet.Tables.Contains(Pagetext))
+                {
+                    Pagetext = PageText +"("+ counter +")";
+                    counter++;
+                }
+                dt.TableName = Pagetext;
+                FilterSet.Tables.Add(dt);
+                LoadFilter(Pagetext, FilterSet);
+            }
+            else
+            {
+                for (int i = 0; i < dt.Rows.Count; i++)
+                {
+                    FilterSet.Tables[PageText].Rows.Add(dt.Rows[i].ItemArray);
+                }
+                LoadFilter(PageText, FilterSet);
+            }
+        }
+
+        //Read filter info from dataset
+        public void LoadFilter(string PageText, DataSet dataSet)
+        {
+            Finnaldt = newdt.Clone();
+            int counter = 0;
+
+            foreach (DataRow dr in dataSet.Tables[PageText].Rows)
+            {
+                foreach (DataColumn dc in dataSet.Tables[PageText].Columns)
+                {
+                    Filtervalue += dr[dc].ToString();
+                }
+                Console.WriteLine(Filtervalue);
+                if (counter == 0)
+                {
+                    DataRow[] rows = newdt.Select(Filtervalue);
+
+                    foreach (DataRow row in rows)  // Put filter result into datatable 
+                    {
+                        Finnaldt.Rows.Add(row.ItemArray);
+                        newdt = Finnaldt.Copy();
+                    }
+                }
+                else
+                {
+                    DataRow[] rows = Finnaldt.Select(Filtervalue);
+                    Finnaldt = Finnaldt.Clone();
+                    foreach (DataRow row in rows)  // Put filter result into datatable 
+                    {
+                        Finnaldt.Rows.Add(row.ItemArray);
+                        newdt = Finnaldt.Copy();
+                    }
+                }
+                counter++;
+                Filtervalue = null;
+            }
+            dgv1.DataSource = Finnaldt;
+            Finnaldt.TableName = PageText;
+            if (FilterResult.Tables.Contains(PageText))
+            {
+                FilterResult.Tables.Remove(PageText);
+            }
+                FilterResult.Tables.Add(Finnaldt);
+
+            TabPage Page = this.tabControl1.SelectedTab;
+            Page.Text = PageText;
+            Page.Controls.Add(dgv1);
+            this.tabControl1.SelectedTab = Page;
         }
     }
 
